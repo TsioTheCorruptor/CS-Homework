@@ -1,16 +1,19 @@
 ﻿using Logic;
+using UeserInterface;
 
 
 internal class Program
 {
     static void Main()
     {
-        char[] hhh = { 'b', 'b' };
-        Engine eng = new Engine(4, 4, 4, 8,hhh);
-        eng.ResetGame(4);
-        eng.GetRandomObjectIndexes();
-        int[] bro = eng.GetGuessInfoAndUpdate("kucky");
-        foreach (int i in bro) { Console.WriteLine(i); }
+        char[] lettersToGuess = {'A', 'B', 'C', 'D', 'E', 'F' };
+        int arrayLength = lettersToGuess.Length;
+        int guessLength = 4;
+        int minGuessNumber = 4;
+        int maxGuessNumber = 10;
+        Engine eng = new Engine(guessLength, maxGuessNumber, minGuessNumber, arrayLength , lettersToGuess);
+        Ui ui = new Ui(eng, guessLength, minGuessNumber, maxGuessNumber, lettersToGuess);
+        ui.Run();
     }
 }
 

@@ -20,16 +20,17 @@ namespace UeserInterface
         private int m_letterArrayLength;
         private char[] m_charArray;
         private string[,]? m_gameHistoryMatrix = null;
-        private bool m_playAnotherGame;
+        private bool m_playAnotherGame = true;
         private bool m_gameOngoing = false;
 
 
-        public Ui(Engine i_engine, int i_minGuessNum, int i_maxGuessNum, int i_guessLength, char[] i_valid_chars) 
+        public Ui(Engine i_engine, int i_guessLength, int i_minGuessNum, int i_maxGuessNum, char[] i_valid_chars) 
         {
             m_engine = i_engine;
             m_maxGuessAmount = i_maxGuessNum;
             m_minGuessAmount = i_minGuessNum;
             m_guessLength = i_guessLength;
+            m_charArray = i_valid_chars;
             m_letterArrayLength = i_valid_chars.Length;
 
         }
@@ -54,9 +55,9 @@ namespace UeserInterface
                 {
                     m_engine.ResetGame(m_guessAmount, m_charArray);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Error: ");
+                    Console.WriteLine("Error: {0}",ex.Message);
                 }
                 m_gameOngoing = m_engine.IsGameOnGoing;
             }
@@ -93,8 +94,8 @@ namespace UeserInterface
             valid = int.TryParse(Console.ReadLine(), out m_guessAmount);
             while (!valid || m_guessAmount < m_minGuessAmount || m_guessAmount > m_maxGuessAmount)
             {
-                Console.WriteLine("Guess number  must be between  {0}-{1}", m_minGuessAmount, m_maxGuessAmount);
                 Screen.Clear();
+                Console.WriteLine("Guess number  Must be between  {0}-{1}", m_minGuessAmount, m_maxGuessAmount);
                 Console.WriteLine("Enter number of guesses you want ({0}-{1}): ", m_minGuessAmount, m_maxGuessAmount);
                 valid = int.TryParse(Console.ReadLine(), out m_guessAmount);
             }
@@ -107,7 +108,6 @@ namespace UeserInterface
             char firstArrayChar = m_charArray[0];
             char lastArrayChar = m_charArray[m_letterArrayLength - 1];
 
-            Screen.Clear();
             Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
             guess = Console.ReadLine().ToUpper();
             valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
@@ -115,7 +115,6 @@ namespace UeserInterface
             while (!valid)
             {
                 Console.WriteLine("Invalid Guess!");
-                Screen.Clear();
                 Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
                 guess = Console.ReadLine().ToUpper();
                 valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
