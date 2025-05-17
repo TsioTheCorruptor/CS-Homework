@@ -36,18 +36,12 @@ namespace UeserInterface
 
         public void Run ()
         {
-            bool playAgain;
             while (m_playAnotherGame)
             {
                 initializeGame();
                 mainGamplayLoop();
             }
-            do
-            {
 
-
-
-            } while (playAgain);
         }
 
         private void initializeGame()
@@ -64,36 +58,30 @@ namespace UeserInterface
                 {
                     Console.WriteLine("Error: ");
                 }
-
-                //m_gameOngoing = engine.isGameOngoing()
-
+                m_gameOngoing = m_engine.IsGameOnGoing;
             }
 
         }
 
         private void mainGamplayLoop()
         {
-            bool guessedCorrectly = false;
-            bool gameOver = false;
-            bool didUserWin = false;
             string userGuess;
-            //m_gameHistoryMatrix = engine.get table
-            //printGuessTable();
+            m_gameHistoryMatrix = m_engine.HistoryMatrix;
+            printGuessTable();
 
 
             while (m_gameOngoing)
             {
 
                 userGuess = promptUserForGuess();
-                // m_gameHistoryMatrix = m_engine.GetGuessMatchingInfo(userGuess);
-                // printGuessTable();
-                // m_gameOngoing = engine.isGameOngoing()
+                m_engine.GetGuessInfoAndUpdate(userGuess);
+                m_gameHistoryMatrix = m_engine.HistoryMatrix;
+                printGuessTable();
+                m_gameOngoing = m_engine.IsGameOnGoing;
             }
 
-            //didUserWin = engine.didUserWin()
-            printGameResultScreen(didUserWin);
-
-             promptUserForRetry();
+            printGameResultScreen();
+            promptUserForRetry();
         }
 
 
@@ -135,36 +123,60 @@ namespace UeserInterface
             return guess;
         }
 
+
         private void printGuessTable()
         {
-            //todo: print according to the matrix
             Screen.Clear();
             Console.WriteLine("Current board status:");
-            Console.WriteLine("|Pins:  |Result:|");
 
-            for (int i = 0; i <= attempts; i++)
+            int colWidth = m_guessLength * 2 - 1;          
+            string hSep = new string('=', colWidth);
+            string divider = $"|{hSep}|{hSep}|";
+
+            // ── header ─────────────────────────────────────────────────────────
+            Console.WriteLine($"|{"Pins:".PadRight(colWidth)}|{"Result:".PadRight(colWidth)}|");
+            Console.WriteLine(divider);
+
+            // ── body ───────────────────────────────────────────────────────────
+            string[,] matrix = m_engine.HistoryMatrix;
+            int rows = matrix.GetLength(0);
+
+            for (int row = 0; row < rows; row++)
             {
-                Console.WriteLine("|=======|=======|");
-                Console.WriteLine($"| {m_engine.m_historyMatrix[i, 0]} | {m_engine.m_historyMatrix[i, 1]} |");
+                string rawPins = matrix[row, 0];
+                string rawResult = matrix[row, 1];
+
+                string pinsCell = buildSpacedCell(rawPins, m_guessLength, colWidth);
+                string resultCell = buildSpacedCell(rawResult, m_guessLength, colWidth);
+
+                Console.WriteLine($"|{pinsCell}|{resultCell}|");
+                Console.WriteLine(divider);
             }
-            Console.WriteLine("|=======|=======|");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
+        }
+        private static string buildSpacedCell(string raw, int pegCount, int colWidth)
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < pegCount; i++)
+            {
+                char ch = (i < raw.Length) ? raw[i] : ' ';
+                sb.Append(ch);
+
+                if (i < pegCount - 1)
+                    sb.Append(' ');
+            }
+
+            return sb.ToString().PadRight(colWidth);
         }
 
-        private void printGuessTableLine()
+        private void printGameResultScreen()
         {
-
-        }
-
-        private void printGameResultScreen( bool i_userWonGame)
-        {
-            int numOfGuesses;
-            //numOfGuesses = engine.getNumOfGuesses
-            if (i_userWonGame)
-                Console.WriteLine($"You won you guessesd in {numOfGuesses} guesses!");
+            int numOfGuesses = m_engine.TriesAmount;
+            bool userWon = m_engine.IsGameWon;
+            if (userWon)
+                Console.WriteLine("You won you guessesd in {0} guesses!", numOfGuesses);
             else
-                Console.WriteLine($"You lost!");
+                Console.WriteLine("You lost!");
         }
 
         private void promptUserForRetry()
