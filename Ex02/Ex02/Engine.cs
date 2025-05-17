@@ -31,13 +31,13 @@ namespace Logic
         public bool IsGameWon
         {
             get { return m_isGameWon; }
-            set { m_isGameWon = value; }
+            
         }
 
         public bool IsGameOnGoing
         {
             get { return m_isGameOngoing; }
-            set { m_isGameOngoing = value;}
+            
         }
 
         public int MinGuessAmount
@@ -76,16 +76,18 @@ namespace Logic
             ResetMatrix(in_maxGuessAmount);
         }
 
-        public void ResetGame(int in_guessAmount)
+        public void ResetGame(int in_guessAmount, char[] in_objectArray )
         {
-            IsGameOnGoing = true;
-            IsGameWon = false;
+            m_isGameOngoing = true;
+            m_isGameWon = false;
             m_triesAmount = 0;
             m_currGuessAmount = in_guessAmount;
             ResetMatrix(in_guessAmount);
+            CreateCorrectGuess(GetRandomObjectIndexes(),in_objectArray);
+
         }
 
-        public void ResetMatrix(int in_guessAmount)
+        private void ResetMatrix(int in_guessAmount)
         {
             m_historyMatrix = new string[in_guessAmount, 2];
             for (int i = 0; i < in_guessAmount; i++)
@@ -97,7 +99,7 @@ namespace Logic
             }
         }
 
-        public void AddDataToMatrix(string in_guess, string in_result, int in_guessNumber)
+        private void AddDataToMatrix(string in_guess, string in_result, int in_guessNumber)
         {
             if (m_historyMatrix == null)
             {
@@ -108,7 +110,7 @@ namespace Logic
             m_historyMatrix[in_guessNumber, 1] = in_result;
         }
 
-        public int[] GetRandomObjectIndexes()
+        private int[] GetRandomObjectIndexes()
         {
             if (m_guessLength > m_objectAmount)
             {
@@ -134,8 +136,17 @@ namespace Logic
 
             return o_randomIndexes;
         }
+        private void CreateCorrectGuess(int[] in_indexes, char[] in_guessCharacters)
+        {
+            int currentIndex;
+            for(int i = 0;i<m_guessLength;i++)
+            {
+                currentIndex = in_indexes[i];
+                m_correctGuess = m_correctGuess + in_guessCharacters[currentIndex];
+            }
+        }
 
-        public bool IsGuessCorrect(string in_guess, string in_correctGuess)
+        private bool IsGuessCorrect(string in_guess, string in_correctGuess)
         {
             bool o_isEqual = in_guess == in_correctGuess;
             return o_isEqual;
@@ -145,18 +156,18 @@ namespace Logic
         {
             int[] o_resultArray = new int[2];
             bool isGuessCorrect = IsGuessCorrect(in_guess, m_correctGuess);
-            AddDataToMatrix(in_guess, m_correctGuess,m_triesAmount);
+           
 
-            m_triesAmount++;
+            
             if (m_triesAmount == m_currGuessAmount && !isGuessCorrect)
-                IsGameOnGoing = false;
+                m_isGameOngoing = false;
             
             
 
             if (isGuessCorrect)
             {
-                IsGameWon = true; 
-                IsGameOnGoing = false;
+                m_isGameWon = true; 
+                m_isGameOngoing = false;
                 o_resultArray[0] = m_guessLength;
                 return o_resultArray;
             }
@@ -172,8 +183,22 @@ namespace Logic
                     o_resultArray[1]++;
                 }
             }
-
+            AddDataToMatrix(in_guess, CreateGuessResultString(o_resultArray), m_triesAmount);
+            m_triesAmount ++;
             return o_resultArray;
         }
+        private string CreateGuessResultString(int[] in_resultArr)
+    {
+        string stringToReturn="";
+            for (int i = 0; i < in_resultArr[0];)
+                stringToReturn = stringToReturn + "V";
+            for (int y = 1; y < in_resultArr[1]; y++)
+                stringToReturn = stringToReturn + "X";
+
+
+        return stringToReturn;
+
     }
+    }
+    
 }
