@@ -1,116 +1,139 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace Logic
 {
-    
-        internal class Engine
+    internal class Engine
+    {
+        private string _correctGuess = string.Empty;
+        private int _objectAmount;
+        private int _minGuessAmount;
+        private int _maxGuessAmount;
+        private int _currGuessAmount;
+        private int _answerSignTypeAmount;
+        private string[,]? _historyMatrix = null;
+        private int _guessLength;
+
+        public int MinGuessAmount
         {
-        private int m_objectAmount;
-        private int m_minGuessAmount;
-        private int m_maxGuessAmount;
-        private int m_currGuessAmount;
-        private int m_answerSignTypeAmount;
-        private  int MinGuessAmount 
-            {
-            get { 
-                return m_minGuessAmount; 
-                }
-            set 
-            {
-                if (value < m_minGuessAmount)
-                {
-                    throw new Exception(string.Format("guess amount is lower then min amount({0})", m_minGuessAmount));
-                }
-                else { m_minGuessAmount = value; 
-                }
-            } 
-        } 
-            private  int MaxGuessAmount
-        {
-            get { 
-                return m_maxGuessAmount; 
-                }
+            get => _minGuessAmount;
             set
             {
-                if (value < m_maxGuessAmount)
+                if (value < 1)
                 {
-                    throw new Exception(string.Format("guess amount is higher then max amount({0})", m_maxGuessAmount));
+                    throw new Exception($"Guess amount is lower than min amount (1)");
                 }
-                else
-                {
-                    m_maxGuessAmount = value;
-                }
+                _minGuessAmount = value;
             }
         }
-        private  int m_guessLength;
-           
-            private string[,] m_historyMatrix;
 
-            public Engine(int in_guessLength, int in_maxGuessAmount,int in_minGuessAmount,int in_possibleObjectAmount)
-            {
-                m_objectAmount = in_possibleObjectAmount;
-                m_maxGuessAmount=in_maxGuessAmount;
-                m_minGuessAmount= in_minGuessAmount;
-                MinGuessAmount = in_minGuessAmount;
-                m_guessLength = in_guessLength;
-                MaxGuessAmount = in_maxGuessAmount;
-               
-                m_historyMatrix = new string[m_maxGuessAmount, 2];
-            }
-        public void ResetGame(int in_guessAmount)
+        public int MaxGuessAmount
         {
-            m_currGuessAmount = in_guessAmount;
-            
+            get => _maxGuessAmount;
+            set
+            {
+                if (value < 1)
+                {
+                    throw new Exception($"Guess amount is higher than max amount (1)");
+                }
+                _maxGuessAmount = value;
+            }
         }
+
+        public Engine(int guessLength, int maxGuessAmount, int minGuessAmount, int possibleObjectAmount, char[] possibleObjectArray)
+        {
+            _guessLength = guessLength;
+            _objectAmount = possibleObjectAmount;
+            MaxGuessAmount = maxGuessAmount;
+            MinGuessAmount = minGuessAmount;
+
+            ResetMatrix(maxGuessAmount);
+        }
+
+        public void ResetGame(int guessAmount)
+        {
+            _currGuessAmount = guessAmount;
+            ResetMatrix(guessAmount);
+        }
+
+        public void ResetMatrix(int guessAmount)
+        {
+            _historyMatrix = new string[guessAmount, 2];
+            for (int i = 0; i < guessAmount; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    _historyMatrix[i, j] = string.Empty;
+                }
+            }
+        }
+
+        public void AddDataToMatrix(string guess, string result, int guessNumber)
+        {
+            if (_historyMatrix == null)
+            {
+                throw new Exception("History matrix not instantiated");
+            }
+
+            _historyMatrix[guessNumber, 0] = guess;
+            _historyMatrix[guessNumber, 1] = result;
+        }
+
         public int[] GetRandomObjectIndexes()
         {
-            int randomValue;
-            int[] randomList=new int[m_guessLength];
-            Random rand=new Random();
-            for(int i = 0;i< m_guessLength;i++)
+            if (_guessLength > _objectAmount)
             {
-             randomValue = rand.Next(m_objectAmount);
-                randomList[i] = randomValue;
+                throw new ArgumentException("Guess length cannot exceed object amount.");
             }
-            foreach(int i in randomList)
-                Console.WriteLine(i);
-            return randomList;
-            
-        }
-        public bool IsGuessCorrect(string in_guess,string in_correctGuess)
-        {
-            bool isequal;
-            if(in_guess==in_correctGuess)
-               isequal= true;
-            else isequal= false;
-            return isequal;
-        }
-        public int[] GetGuessMatchingInfo(string in_guess, string in_correctGuess)
-        {
-            int[] o_returnArray= new int[2];
 
-            if (IsGuessCorrect(in_guess, in_correctGuess))
-                o_returnArray[0] = m_guessLength;
-            else
+            int[] randomIndexes = new int[_guessLength];
+            List<int> availableIndexes = new List<int>();
+
+            for (int i = 0; i < _objectAmount; i++)
             {
-                for(int i = 0; i < m_guessLength;i++)
+                availableIndexes.Add(i);
+            }
+
+            Random rand = new Random();
+
+            for (int i = 0; i < _guessLength; i++)
+            {
+                int randomIndex = rand.Next(availableIndexes.Count);
+                randomIndexes[i] = availableIndexes[randomIndex];
+                availableIndexes.RemoveAt(randomIndex);
+            }
+
+            return randomIndexes;
+        }
+
+        public bool IsGuessCorrect(string guess, string correctGuess)
+        {
+            return guess == correctGuess;
+        }
+
+        public int[] GetGuessMatchingInfo(string guess, string correctGuess)
+        {
+            int[] result = new int[2];
+
+            if (IsGuessCorrect(guess, correctGuess))
+            {
+                result[0] = _guessLength;
+                return result;
+            }
+
+            for (int i = 0; i < _guessLength; i++)
+            {
+                if (guess[i] == correctGuess[i])
                 {
-                    if (in_guess[i] == in_correctGuess[i])
-                        o_returnArray[0]++;
-                    else
-                    {
-                        if (in_correctGuess.Contains(in_guess[i]))
-                            o_returnArray[1]++;
-                    }
+                    result[0]++;
+                }
+                else if (correctGuess.Contains(guess[i]))
+                {
+                    result[1]++;
                 }
             }
-            return o_returnArray;    
-        }
+
+            return result;
         }
     }
+}
