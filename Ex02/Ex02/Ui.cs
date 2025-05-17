@@ -13,75 +13,131 @@ namespace UeserInterface
     {
 
         private Engine m_engine;
-        private int m_guessAmount;
+        private int m_guessAmount = 0;
+        private int m_maxGuessAmount;
+        private int m_minGuessAmount;
+        private int m_guessLength;
+        private int m_letterArrayLength;
+        private char[] m_charArray;
+        private string[,]? m_gameHistoryMatrix = null;
+        private bool m_playAnotherGame;
+        private bool m_gameOngoing = false;
 
-        public Ui(Engine i_engine) 
+
+        public Ui(Engine i_engine, int i_minGuessNum, int i_maxGuessNum, int i_guessLength, char[] i_valid_chars) 
         {
             m_engine = i_engine;
+            m_maxGuessAmount = i_maxGuessNum;
+            m_minGuessAmount = i_minGuessNum;
+            m_guessLength = i_guessLength;
+            m_letterArrayLength = i_valid_chars.Length;
 
         }
 
         public void Run ()
         {
             bool playAgain;
+            while (m_playAnotherGame)
+            {
+                initializeGame();
+                mainGamplayLoop();
+            }
             do
             {
-                promptUserForNumberOfGuesses();
-                m_engine.ResetGame(m_guessAmount);
-                int[] randomIndexes = m_engine.GetRandomObjectIndexes();
-                m_correctAnswer = string.Join("", Array.ConvertAll(randomIndexes, i => ((char)(i + 'A')).ToString()));
-                bool guessedCorrectly = false;
 
-                for (int attempt = 0; attempt < m_guessAmount && !guessedCorrectly; attempt++)
-                {
-                    promptUserForGuess(attempt);
-                    printGuessTable(attempt);
-                    guessedCorrectly = m_engine.IsGuessCorrect(m_engine.m_historyMatrix[attempt, 0], m_correctAnswer);
-                }
 
-                printGameResultScreen(guessedCorrectly);
-                playAgain = promptUserForRetry();
 
             } while (playAgain);
+        }
+
+        private void initializeGame()
+        {
+            
+            while (!m_gameOngoing)
+            {
+                promptUserForNumberOfGuesses();
+                try
+                {
+                    m_engine.ResetGame(m_guessAmount, m_charArray);
+                }
+                catch
+                {
+                    Console.WriteLine("Error: ");
+                }
+
+                //m_gameOngoing = engine.isGameOngoing()
+
+            }
+
+        }
+
+        private void mainGamplayLoop()
+        {
+            bool guessedCorrectly = false;
+            bool gameOver = false;
+            bool didUserWin = false;
+            string userGuess;
+            //m_gameHistoryMatrix = engine.get table
+            //printGuessTable();
+
+
+            while (m_gameOngoing)
+            {
+
+                userGuess = promptUserForGuess();
+                // m_gameHistoryMatrix = m_engine.GetGuessMatchingInfo(userGuess);
+                // printGuessTable();
+                // m_gameOngoing = engine.isGameOngoing()
+            }
+
+            //didUserWin = engine.didUserWin()
+            printGameResultScreen(didUserWin);
+
+             promptUserForRetry();
         }
 
 
         private void promptUserForNumberOfGuesses()
         {
-            bool valid;
-            do
+            bool valid = false;
+            Screen.Clear();
+            Console.WriteLine("Enter number of guesses you want ({0}-{1}): ", m_minGuessAmount, m_maxGuessAmount);
+            valid = int.TryParse(Console.ReadLine(), out m_guessAmount);
+            while (!valid || m_guessAmount < m_minGuessAmount || m_guessAmount > m_maxGuessAmount)
             {
+                Console.WriteLine("Guess number  must be between  {0}-{1}", m_minGuessAmount, m_maxGuessAmount);
                 Screen.Clear();
-                Console.WriteLine("Enter number of guesses you want (4-10): ");
+                Console.WriteLine("Enter number of guesses you want ({0}-{1}): ", m_minGuessAmount, m_maxGuessAmount);
                 valid = int.TryParse(Console.ReadLine(), out m_guessAmount);
-
-            } while (!valid || m_guessAmount < 4 || m_guessAmount > 10);
+            }
         }
 
-        private void promptUserForGuess()
+        private string promptUserForGuess()
         {
             bool valid;
             string guess;
+            char firstArrayChar = m_charArray[0];
+            char lastArrayChar = m_charArray[m_letterArrayLength - 1];
 
-            do
+            Screen.Clear();
+            Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
+            guess = Console.ReadLine().ToUpper();
+            valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
+
+            while (!valid)
             {
+                Console.WriteLine("Invalid Guess!");
                 Screen.Clear();
-                Console.WriteLine("Please type your next guess (4 letters between A-F):");
+                Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
                 guess = Console.ReadLine().ToUpper();
-                valid = guess.Length == 4 && guess.All(c => c >= 'A' && c <= 'F');
-
-            } while (!valid);
-
-            int[] matchInfo = m_engine.GetGuessMatchingInfo(guess, m_correctAnswer);
-            string pins = new string('V', matchInfo[0]) + new string('X', matchInfo[1]);
-            pins = pins.PadRight(4);
-
-            m_engine.m_historyMatrix[attempt, 0] = guess;
-            m_engine.m_historyMatrix[attempt, 1] = pins;
+                valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
+            } 
+            return guess;
         }
 
         private void printGuessTable()
         {
+            //todo: print according to the matrix
             Screen.Clear();
             Console.WriteLine("Current board status:");
             Console.WriteLine("|Pins:  |Result:|");
@@ -101,25 +157,33 @@ namespace UeserInterface
 
         }
 
-        private void printGameResultScreen()
+        private void printGameResultScreen( bool i_userWonGame)
         {
-
-            if (guessedCorrectly)
-                Console.WriteLine($"You won in less than {m_guessAmount} guesses!");
+            int numOfGuesses;
+            //numOfGuesses = engine.getNumOfGuesses
+            if (i_userWonGame)
+                Console.WriteLine($"You won you guessesd in {numOfGuesses} guesses!");
             else
-                Console.WriteLine($"You lost! Correct answer was {m_correctAnswer}");
+                Console.WriteLine($"You lost!");
         }
 
         private void promptUserForRetry()
         {
-            Console.WriteLine("Would you like to start a new game? (Y/N)");
-            string answer;
-            do
-            {
-                answer = Console.ReadLine().ToUpper();
-            } while (answer != "Y" && answer != "N");
 
-            return answer == "Y";
+            string answer = "";
+            while (answer != "Y" && answer != "N")
+            {
+                Console.WriteLine("Would you like to start a new game? (Y/N)");
+                answer = Console.ReadLine().ToUpper();
+            }
+            if (answer == "Y")
+            {
+                m_playAnotherGame = true;
+            }
+            else
+            {
+                m_playAnotherGame = false;
+            }
         }
 
     }
