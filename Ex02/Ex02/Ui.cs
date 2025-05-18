@@ -163,7 +163,7 @@ namespace UeserInterface
         private static string buildSpacedCell(string raw, int pegCount, int colWidth)
         {
             var sb = new StringBuilder();
-            sb.Append(' '); // leading padding
+            sb.Append(' ');
 
             for (int i = 0; i < pegCount; i++)
             {
@@ -174,7 +174,7 @@ namespace UeserInterface
                     sb.Append(' ');
             }
 
-            sb.Append(' '); // trailing padding
+            sb.Append(' '); 
 
             return sb.ToString().PadRight(colWidth);
         }
