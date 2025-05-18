@@ -64,7 +64,10 @@ namespace UeserInterface
         private void mainGamplayLoop()
         {
             string userGuess;
+            bool quitting = false;
+
             m_gameHistoryMatrix = m_engine.HistoryMatrix;
+
             printGuessTable();
 
 
@@ -75,16 +78,24 @@ namespace UeserInterface
                 {
                     m_playAnotherGame = false;
                     m_gameOngoing = false;
-                    return;
+                    quitting = true;
                 }
-                m_engine.GetGuessInfoAndUpdate(userGuess);
-                m_gameHistoryMatrix = m_engine.HistoryMatrix;
-                printGuessTable();
-                m_gameOngoing = m_engine.IsGameOnGoing;
+                else
+                {
+                    m_engine.GetGuessInfoAndUpdate(userGuess);
+                    m_gameHistoryMatrix = m_engine.HistoryMatrix;
+                    printGuessTable();
+                    m_gameOngoing = m_engine.IsGameOnGoing;
+                }
+
             }
 
-            printGameResultScreen();
-            promptUserForRetry();
+            if (quitting)
+            {
+                printGameResultScreen();
+                promptUserForRetry();
+            }
+
         }
 
 
@@ -112,7 +123,7 @@ namespace UeserInterface
             string lettersDisplay = string.Join(" ", m_charArray);
 
             Console.WriteLine("Please type your next guess <{0}> or '{1}' to quit:", lettersDisplay, k_QuitCommand);
-            guess = Console.ReadLine().ToUpper();
+            guess = Console.ReadLine();
 
             valid = (guess.Length == m_guessLength && guess.All(c => c >= firstArrayChar && c <= lastArrayChar))|| guess == k_QuitCommand;
 
@@ -120,7 +131,7 @@ namespace UeserInterface
             {
                 Console.WriteLine("Invalid Guess!");
                 Console.WriteLine("Please type your next guess <{0}> or '{1}' to quit:", lettersDisplay, k_QuitCommand);
-                guess = Console.ReadLine().ToUpper();
+                guess = Console.ReadLine();
 
                 valid = (guess.Length == m_guessLength && guess.All(c => c >= firstArrayChar && c <= lastArrayChar)) || guess == k_QuitCommand;
             } 
@@ -192,7 +203,7 @@ namespace UeserInterface
             while (answer != "Y" && answer != "N")
             {
                 Console.WriteLine("Would you like to start a new game? (Y/N)");
-                answer = Console.ReadLine().ToUpper();
+                answer = Console.ReadLine();
             }
             if (answer == "Y")
             {
