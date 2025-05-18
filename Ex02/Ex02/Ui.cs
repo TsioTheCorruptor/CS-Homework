@@ -7,6 +7,7 @@ namespace UeserInterface
 {
     internal class Ui
     {
+        private const string k_QuitCommand = "Q";
 
         private Engine m_engine;
         private int m_guessAmount = 0;
@@ -69,8 +70,13 @@ namespace UeserInterface
 
             while (m_gameOngoing)
             {
-
                 userGuess = promptUserForGuess();
+                if (userGuess == k_QuitCommand) 
+                {
+                    m_playAnotherGame = false;
+                    m_gameOngoing = false;
+                    return;
+                }
                 m_engine.GetGuessInfoAndUpdate(userGuess);
                 m_gameHistoryMatrix = m_engine.HistoryMatrix;
                 printGuessTable();
@@ -106,6 +112,12 @@ namespace UeserInterface
 
             Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
             guess = Console.ReadLine().ToUpper();
+
+            if (guess == k_QuitCommand)
+            {
+                return k_QuitCommand;
+            }
+
             valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
 
             while (!valid)
@@ -128,11 +140,10 @@ namespace UeserInterface
             string hSep = new string('=', colWidth);
             string divider = $"|{hSep}|{hSep}|";
 
-            // ── header ─────────────────────────────────────────────────────────
             Console.WriteLine($"|{"Pins:".PadRight(colWidth)}|{"Result:".PadRight(colWidth)}|");
             Console.WriteLine(divider);
+            //add row of ####
 
-            // ── body ───────────────────────────────────────────────────────────
             string[,] matrix = m_engine.HistoryMatrix;
             int rows = matrix.GetLength(0);
 
