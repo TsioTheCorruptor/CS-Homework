@@ -116,25 +116,34 @@ namespace UeserInterface
 
         private string promptUserForGuess()
         {
-            bool valid;
-            string guess;
+            bool valid = false;
+            string? guess;
             char firstArrayChar = m_charArray[0];
             char lastArrayChar = m_charArray[m_letterArrayLength - 1];
             string lettersDisplay = string.Join(" ", m_charArray);
 
             Console.WriteLine("Please type your next guess <{0}> or '{1}' to quit:", lettersDisplay, k_QuitCommand);
             guess = Console.ReadLine();
-
-            valid = (guess.Length == m_guessLength && guess.All(c => c >= firstArrayChar && c <= lastArrayChar))|| guess == k_QuitCommand;
+            if (guess != null)
+            {
+                valid = isValidGuess(guess);
+            }
 
             while (!valid)
             {
                 Console.WriteLine("Invalid Guess!");
                 Console.WriteLine("Please type your next guess <{0}> or '{1}' to quit:", lettersDisplay, k_QuitCommand);
                 guess = Console.ReadLine();
+                if (guess != null)
+                {
+                    valid = isValidGuess(guess);
+                }
+            }
 
-                valid = (guess.Length == m_guessLength && guess.All(c => c >= firstArrayChar && c <= lastArrayChar)) || guess == k_QuitCommand;
-            } 
+            if (guess == null)
+            {
+                guess = k_QuitCommand;
+            }
             return guess;
         }
 
@@ -168,6 +177,28 @@ namespace UeserInterface
             Console.WriteLine();
         }
 
+
+        private bool isValidGuess(string i_guess)
+        {
+            if (i_guess == k_QuitCommand)
+            {
+                return true;
+            }
+
+            if (i_guess.Length != m_guessLength)
+            {
+                return false;
+            }
+
+            char firstChar = m_charArray[0];
+            char lastChar = m_charArray[m_letterArrayLength - 1];
+
+            bool inRange = i_guess.All(c => c >= firstChar && c <= lastChar);
+            bool allUnique = i_guess.Distinct().Count() == i_guess.Length;
+
+            return inRange && allUnique;
+        }
+
         private static string buildSpacedCell(string raw, int pegCount, int colWidth)
         {
             var cell = new StringBuilder();
@@ -199,11 +230,15 @@ namespace UeserInterface
         private void promptUserForRetry()
         {
 
-            string answer = "";
+            string? answer = "";
             while (answer != "Y" && answer != "N")
             {
                 Console.WriteLine("Would you like to start a new game? (Y/N)");
                 answer = Console.ReadLine();
+                if (answer == null)
+                {
+                    answer = "N";
+                }
             }
             if (answer == "Y")
             {
