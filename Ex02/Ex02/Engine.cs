@@ -11,7 +11,7 @@ namespace Logic
         private int m_minGuessAmount;
         private int m_maxGuessAmount;
         private int m_currGuessAmount;
-        private int m_answerSignTypeAmount;
+        
         private string[,]? m_historyMatrix = null;
         private int m_guessLength;
         private int m_triesAmount;
@@ -43,7 +43,7 @@ namespace Logic
 
         public int MinGuessAmount
         {
-            get => m_minGuessAmount;
+            get { return m_minGuessAmount; }
             set
             {
                 if (value < m_minGuessAmount)
@@ -56,7 +56,7 @@ namespace Logic
 
         public int MaxGuessAmount
         {
-            get => m_maxGuessAmount;
+            get { return m_maxGuessAmount; }
             set
             {
                 if (value < m_maxGuessAmount)
@@ -83,6 +83,7 @@ namespace Logic
             m_isGameWon = false;
             m_triesAmount = 0;
             m_currGuessAmount = in_guessAmount;
+            m_correctGuess=string.Empty;
             ResetMatrix(in_guessAmount+1);
             CreateCorrectGuess(GetRandomObjectIndexes(),in_objectArray);
 

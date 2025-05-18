@@ -157,9 +157,9 @@ namespace UeserInterface
 
             int colWidth = m_guessLength * 2 + 1;
             string hSep = new string('=', colWidth);
-            string divider = $"|{hSep}|{hSep}|";
+            string divider =string.Format( "|{0}|{1}|",hSep,hSep);
 
-            Console.WriteLine($"|{"Pins:".PadRight(colWidth)}|{"Result:".PadRight(colWidth)}|");
+            Console.WriteLine(string.Format("|{0}|{1}|","Pins:".PadRight(colWidth),"Result:".PadRight(colWidth)));
             Console.WriteLine(divider);
 
             string[,] matrix = m_engine.HistoryMatrix;
@@ -173,7 +173,7 @@ namespace UeserInterface
                 string pinsCell = buildSpacedCell(rawPins, m_guessLength, colWidth);
                 string resultCell = buildSpacedCell(rawResult, m_guessLength, colWidth);
 
-                Console.WriteLine($"|{pinsCell}|{resultCell}|");
+                Console.WriteLine(string.Format("|{0}|{1}|",pinsCell,resultCell));
                 Console.WriteLine(divider);
             }
             Console.WriteLine();
@@ -195,7 +195,15 @@ namespace UeserInterface
             char firstChar = m_charArray[0];
             char lastChar = m_charArray[m_letterArrayLength - 1];
 
-            bool inRange = i_guess.All(c => c >= firstChar && c <= lastChar);
+            bool inRange = true;
+            foreach (char c in i_guess)
+            {
+                if (c < firstChar || c > lastChar)
+                {
+                    inRange = false;
+                    break;
+                }
+            }
             bool allUnique = i_guess.Distinct().Count() == i_guess.Length;
 
             return inRange && allUnique;
@@ -203,7 +211,7 @@ namespace UeserInterface
 
         private static string buildSpacedCell(string raw, int pegCount, int colWidth)
         {
-            var cell = new StringBuilder();
+            StringBuilder cell = new StringBuilder();
             cell.Append(' ');
 
             for (int i = 0; i < pegCount; i++)

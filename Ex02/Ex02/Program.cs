@@ -1,19 +1,12 @@
-﻿using Logic;
-using UeserInterface;
+﻿using Game;
 
-
-internal class Program
+namespace Program
 {
-    static void Main()
+    internal class Program
     {
-        char[] lettersToGuess = {'A', 'B', 'C', 'D', 'E', 'F' };
-        int arrayLength = lettersToGuess.Length;
-        int guessLength = 4;
-        int minGuessNumber = 4;
-        int maxGuessNumber = 10;
-        Engine eng = new Engine(guessLength, maxGuessNumber, minGuessNumber, arrayLength , lettersToGuess);
-        Ui ui = new Ui(eng, guessLength, minGuessNumber, maxGuessNumber, lettersToGuess);
-        ui.Run();
+        static void Main()
+        {
+            Game.Game.run();
+        }
     }
 }
-
