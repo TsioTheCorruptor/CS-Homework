@@ -155,8 +155,8 @@ namespace UeserInterface
             Screen.Clear();
             Console.WriteLine("Current board status:");
 
-            int pinsColWidth = m_guessLength * 2 + 1; // padding on both sides
-            int resultColWidth = pinsColWidth - 2;      // no side‑padding → two chars thinner
+            int pinsColWidth = m_guessLength * 2 + 1;
+            int resultColWidth = pinsColWidth - 2;
 
             string hSepPins = new string('=', pinsColWidth);
             string hSepResult = new string('=', resultColWidth);
@@ -182,10 +182,10 @@ namespace UeserInterface
             Console.WriteLine();
         }
 
-        // builds a cell with leading and trailing padding
+
         private static string buildSpacedCellWithPadding(string raw, int pegCount, int colWidth)
         {
-            var sb = new StringBuilder(" "); // leading space
+            var sb = new StringBuilder(" ");
 
             for (int i = 0; i < pegCount; i++)
             {
@@ -198,11 +198,11 @@ namespace UeserInterface
                 }
             }
 
-            sb.Append(' '); // trailing space
+            sb.Append(' ');
             return sb.ToString().PadRight(colWidth);
         }
 
-        // builds a cell with NO leading/trailing padding (used for Result column)
+
         private static string buildSpacedCellNoPadding(string raw, int pegCount, int colWidth)
         {
             var sb = new StringBuilder();
