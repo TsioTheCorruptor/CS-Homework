@@ -155,11 +155,14 @@ namespace UeserInterface
             Screen.Clear();
             Console.WriteLine("Current board status:");
 
-            int colWidth = m_guessLength * 2 + 1;
-            string hSep = new string('=', colWidth);
-            string divider =string.Format( "|{0}|{1}|",hSep,hSep);
+            int pinsColWidth = m_guessLength * 2 + 1; // padding on both sides
+            int resultColWidth = pinsColWidth - 2;      // no side‑padding → two chars thinner
 
-            Console.WriteLine(string.Format("|{0}|{1}|","Pins:".PadRight(colWidth),"Result:".PadRight(colWidth)));
+            string hSepPins = new string('=', pinsColWidth);
+            string hSepResult = new string('=', resultColWidth);
+            string divider = $"|{hSepPins}|{hSepResult}|";
+
+            Console.WriteLine($"|{"Pins:".PadRight(pinsColWidth)}|{"Result:".PadRight(resultColWidth)}|");
             Console.WriteLine(divider);
 
             string[,] matrix = m_engine.HistoryMatrix;
@@ -170,14 +173,54 @@ namespace UeserInterface
                 string rawPins = matrix[row, 0];
                 string rawResult = matrix[row, 1];
 
-                string pinsCell = buildSpacedCell(rawPins, m_guessLength, colWidth);
-                string resultCell = buildSpacedCell(rawResult, m_guessLength, colWidth);
+                string pinsCell = buildSpacedCellWithPadding(rawPins, m_guessLength, pinsColWidth);
+                string resultCell = buildSpacedCellNoPadding(rawResult, m_guessLength, resultColWidth);
 
-                Console.WriteLine(string.Format("|{0}|{1}|",pinsCell,resultCell));
+                Console.WriteLine($"|{pinsCell}|{resultCell}|");
                 Console.WriteLine(divider);
             }
             Console.WriteLine();
         }
+
+        // builds a cell with leading and trailing padding
+        private static string buildSpacedCellWithPadding(string raw, int pegCount, int colWidth)
+        {
+            var sb = new StringBuilder(" "); // leading space
+
+            for (int i = 0; i < pegCount; i++)
+            {
+                char ch = i < raw.Length ? raw[i] : ' ';
+                sb.Append(ch);
+
+                if (i < pegCount - 1)
+                {
+                    sb.Append(' ');
+                }
+            }
+
+            sb.Append(' '); // trailing space
+            return sb.ToString().PadRight(colWidth);
+        }
+
+        // builds a cell with NO leading/trailing padding (used for Result column)
+        private static string buildSpacedCellNoPadding(string raw, int pegCount, int colWidth)
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < pegCount; i++)
+            {
+                char ch = i < raw.Length ? raw[i] : ' ';
+                sb.Append(ch);
+
+                if (i < pegCount - 1)
+                {
+                    sb.Append(' ');
+                }
+            }
+
+            return sb.ToString().PadRight(colWidth);
+        }
+
 
 
         private bool isValidGuess(string i_guess)
@@ -209,24 +252,6 @@ namespace UeserInterface
             return inRange && allUnique;
         }
 
-        private static string buildSpacedCell(string raw, int pegCount, int colWidth)
-        {
-            StringBuilder cell = new StringBuilder();
-            cell.Append(' ');
-
-            for (int i = 0; i < pegCount; i++)
-            {
-                char cellChar = (i < raw.Length) ? raw[i] : ' ';
-                cell.Append(cellChar);
-
-                if (i < pegCount - 1)
-                    cell.Append(' ');
-            }
-
-            cell.Append(' '); 
-
-            return cell.ToString().PadRight(colWidth);
-        }
         private void printGameResultScreen()
         {
             int numOfGuesses = m_engine.TriesAmount;
