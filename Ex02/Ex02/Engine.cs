@@ -6,6 +6,7 @@ namespace Logic
     internal class Engine
     {
         private string m_correctGuess = string.Empty;
+        private static readonly char  m_correctAnswerMask='#';
         private int m_objectAmount;
         private int m_minGuessAmount;
         private int m_maxGuessAmount;
@@ -82,7 +83,7 @@ namespace Logic
             m_isGameWon = false;
             m_triesAmount = 0;
             m_currGuessAmount = in_guessAmount;
-            ResetMatrix(in_guessAmount);
+            ResetMatrix(in_guessAmount+1);
             CreateCorrectGuess(GetRandomObjectIndexes(),in_objectArray);
 
         }
@@ -97,6 +98,11 @@ namespace Logic
                     m_historyMatrix[i, j] = string.Empty;
                 }
             }
+             
+            string maskString = new string(m_correctAnswerMask, m_guessLength);
+            m_historyMatrix[0,0] = maskString;
+            
+
         }
 
         private void AddDataToMatrix(string in_guess, string in_result, int in_guessNumber)
@@ -153,7 +159,7 @@ namespace Logic
             return o_isEqual;
         }
 
-        public int[] GetGuessInfoAndUpdate(string in_guess)
+        public void GetGuessInfoAndUpdate(string in_guess)
         {
            
             int[] o_resultArray = new int[2];
@@ -162,7 +168,12 @@ namespace Logic
 
             
             if (m_triesAmount == m_currGuessAmount-1 && !isGuessCorrect)
+            {
                 m_isGameOngoing = false;
+                AddDataToMatrix(m_correctGuess, "", 0);
+
+            }
+                
             
             
 
@@ -171,8 +182,11 @@ namespace Logic
                 m_isGameWon = true; 
                 m_isGameOngoing = false;
                 o_resultArray[0] = m_guessLength;
-                return o_resultArray;
+                AddDataToMatrix(m_correctGuess, "", 0);
+                
+                
             }
+            
 
             for (int i = 0; i < m_guessLength; i++)
             {
@@ -185,9 +199,9 @@ namespace Logic
                     o_resultArray[1]++;
                 }
             }
-            AddDataToMatrix(in_guess, CreateGuessResultString(o_resultArray), m_triesAmount);
+            AddDataToMatrix(in_guess, CreateGuessResultString(o_resultArray), m_triesAmount+1);
             m_triesAmount ++;
-            return o_resultArray;
+            
         }
         private string CreateGuessResultString(int[] in_resultArr)
     {
