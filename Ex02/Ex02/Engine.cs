@@ -144,6 +144,7 @@ namespace Logic
                 currentIndex = in_indexes[i];
                 m_correctGuess = m_correctGuess + in_guessCharacters[currentIndex];
             }
+            
         }
 
         private bool IsGuessCorrect(string in_guess, string in_correctGuess)
@@ -154,12 +155,13 @@ namespace Logic
 
         public int[] GetGuessInfoAndUpdate(string in_guess)
         {
+           
             int[] o_resultArray = new int[2];
             bool isGuessCorrect = IsGuessCorrect(in_guess, m_correctGuess);
            
 
             
-            if (m_triesAmount == m_currGuessAmount && !isGuessCorrect)
+            if (m_triesAmount == m_currGuessAmount-1 && !isGuessCorrect)
                 m_isGameOngoing = false;
             
             
@@ -190,9 +192,9 @@ namespace Logic
         private string CreateGuessResultString(int[] in_resultArr)
     {
         string stringToReturn="";
-            for (int i = 0; i < in_resultArr[0];)
+            for (int i = 0; i < in_resultArr[0];i++)
                 stringToReturn = stringToReturn + "V";
-            for (int y = 1; y < in_resultArr[1]; y++)
+            for (int y =0 ; y< in_resultArr[1]; y++)
                 stringToReturn = stringToReturn + "X";
 
 
