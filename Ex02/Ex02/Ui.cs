@@ -90,7 +90,7 @@ namespace UeserInterface
 
             }
 
-            if (quitting)
+            if (!quitting)
             {
                 printGameResultScreen();
                 promptUserForRetry();
