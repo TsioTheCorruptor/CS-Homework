@@ -8,6 +8,8 @@ namespace UeserInterface
     internal class Ui
     {
         private readonly string k_QuitCommand = "Q";
+        private readonly string k_YesString = "Y";
+        private readonly string k_NoString = "N";
 
         private Engine m_engine;
         private int m_guessAmount = 0;
@@ -103,13 +105,13 @@ namespace UeserInterface
         {
             bool valid = false;
             Screen.Clear();
-            Console.WriteLine("Enter number of guesses you want ({0}-{1}): ", m_minGuessAmount, m_maxGuessAmount);
+            Console.WriteLine("Enter number of guesses you want <{0}-{1}>: ", m_minGuessAmount, m_maxGuessAmount);
             valid = int.TryParse(Console.ReadLine(), out m_guessAmount);
             while (!valid || m_guessAmount < m_minGuessAmount || m_guessAmount > m_maxGuessAmount)
             {
                 Screen.Clear();
-                Console.WriteLine("Guess number  Must be between  {0}-{1}", m_minGuessAmount, m_maxGuessAmount);
-                Console.WriteLine("Enter number of guesses you want ({0}-{1}): ", m_minGuessAmount, m_maxGuessAmount);
+                Console.WriteLine("Guess number  Must be between  {0} to {1}", m_minGuessAmount, m_maxGuessAmount);
+                Console.WriteLine("Enter number of guesses you want <{0}-{1}>: ", m_minGuessAmount, m_maxGuessAmount);
                 valid = int.TryParse(Console.ReadLine(), out m_guessAmount);
             }
         }
@@ -224,23 +226,23 @@ namespace UeserInterface
             if (userWon)
                 Console.WriteLine("You won you guessesed in {0} guesses!", numOfGuesses);
             else
-                Console.WriteLine("You lost!");
+                Console.WriteLine("No more guesses allowed. You Lost!");
         }
 
         private void promptUserForRetry()
         {
 
-            string? answer = "";
-            while (answer != "Y" && answer != "N")
+            string? answer = null;
+            while (answer != k_YesString && answer != k_NoString)
             {
-                Console.WriteLine("Would you like to start a new game? (Y/N)");
+                Console.WriteLine("Would you like to start a new game? <{0}/{1}>", k_YesString, k_NoString);
                 answer = Console.ReadLine();
                 if (answer == null)
                 {
-                    answer = "N";
+                    answer = k_NoString;
                 }
             }
-            if (answer == "Y")
+            if (answer == k_YesString)
             {
                 m_playAnotherGame = true;
             }
