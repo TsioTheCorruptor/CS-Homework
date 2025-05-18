@@ -136,17 +136,12 @@ namespace UeserInterface
             Screen.Clear();
             Console.WriteLine("Current board status:");
 
-            int colWidth = m_guessLength * 2 - 1;          
+            // +2 spaces (one on each side) compared to the old formula
+            int colWidth = m_guessLength * 2 + 1;
             string hSep = new string('=', colWidth);
             string divider = $"|{hSep}|{hSep}|";
-            string hiddenPins = new string('#', m_guessLength);
-            string hashPinsCell = buildSpacedCell(hiddenPins, m_guessLength, colWidth);
-            string emptyResultCell = new string(' ', colWidth);
-
 
             Console.WriteLine($"|{"Pins:".PadRight(colWidth)}|{"Result:".PadRight(colWidth)}|");
-            Console.WriteLine(divider);
-            Console.WriteLine($"|{hashPinsCell}|{emptyResultCell}|");
             Console.WriteLine(divider);
 
             string[,] matrix = m_engine.HistoryMatrix;
@@ -164,9 +159,11 @@ namespace UeserInterface
                 Console.WriteLine(divider);
             }
         }
+
         private static string buildSpacedCell(string raw, int pegCount, int colWidth)
         {
             var sb = new StringBuilder();
+            sb.Append(' '); // leading padding
 
             for (int i = 0; i < pegCount; i++)
             {
@@ -177,9 +174,10 @@ namespace UeserInterface
                     sb.Append(' ');
             }
 
+            sb.Append(' '); // trailing padding
+
             return sb.ToString().PadRight(colWidth);
         }
-
         private void printGameResultScreen()
         {
             int numOfGuesses = m_engine.TriesAmount;
