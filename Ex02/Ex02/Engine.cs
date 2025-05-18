@@ -6,7 +6,7 @@ namespace Logic
     internal class Engine
     {
         private string m_correctGuess = string.Empty;
-        private static readonly char  m_correctAnswerMask='#';
+        private static readonly char  k_correctAnswerMask='#';
         private int m_objectAmount;
         private int m_minGuessAmount;
         private int m_maxGuessAmount;
@@ -100,7 +100,7 @@ namespace Logic
                 }
             }
              
-            string maskString = new string(m_correctAnswerMask, m_guessLength);
+            string maskString = new string(k_correctAnswerMask, m_guessLength);
             m_historyMatrix[0,0] = maskString;
             
 
