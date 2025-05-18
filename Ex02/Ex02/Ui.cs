@@ -139,10 +139,15 @@ namespace UeserInterface
             int colWidth = m_guessLength * 2 - 1;          
             string hSep = new string('=', colWidth);
             string divider = $"|{hSep}|{hSep}|";
+            string hiddenPins = new string('#', m_guessLength);
+            string hashPinsCell = buildSpacedCell(hiddenPins, m_guessLength, colWidth);
+            string emptyResultCell = new string(' ', colWidth);
+
 
             Console.WriteLine($"|{"Pins:".PadRight(colWidth)}|{"Result:".PadRight(colWidth)}|");
             Console.WriteLine(divider);
-            //add row of ####
+            Console.WriteLine($"|{hashPinsCell}|{emptyResultCell}|");
+            Console.WriteLine(divider);
 
             string[,] matrix = m_engine.HistoryMatrix;
             int rows = matrix.GetLength(0);
