@@ -133,7 +133,6 @@ namespace UeserInterface
             Screen.Clear();
             Console.WriteLine("Current board status:");
 
-            // +2 spaces (one on each side) compared to the old formula
             int colWidth = m_guessLength * 2 + 1;
             string hSep = new string('=', colWidth);
             string divider = $"|{hSep}|{hSep}|";
@@ -181,7 +180,7 @@ namespace UeserInterface
             int numOfGuesses = m_engine.TriesAmount;
             bool userWon = m_engine.IsGameWon;
             if (userWon)
-                Console.WriteLine("You won you guessesd in {0} guesses!", numOfGuesses);
+                Console.WriteLine("You won you guessesed in {0} guesses!", numOfGuesses);
             else
                 Console.WriteLine("You lost!");
         }
