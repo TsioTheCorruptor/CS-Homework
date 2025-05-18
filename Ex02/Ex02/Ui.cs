@@ -7,7 +7,7 @@ namespace UeserInterface
 {
     internal class Ui
     {
-        private const string k_QuitCommand = "Q";
+        private readonly string k_QuitCommand = "Q";
 
         private Engine m_engine;
         private int m_guessAmount = 0;
@@ -109,23 +109,20 @@ namespace UeserInterface
             string guess;
             char firstArrayChar = m_charArray[0];
             char lastArrayChar = m_charArray[m_letterArrayLength - 1];
+            string lettersDisplay = string.Join(" ", m_charArray);
 
-            Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
+            Console.WriteLine("Please type your next guess <{0}> or '{1}' to quit:", lettersDisplay, k_QuitCommand);
             guess = Console.ReadLine().ToUpper();
 
-            if (guess == k_QuitCommand)
-            {
-                return k_QuitCommand;
-            }
-
-            valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
+            valid = (guess.Length == m_guessLength && guess.All(c => c >= firstArrayChar && c <= lastArrayChar))|| guess == k_QuitCommand;
 
             while (!valid)
             {
                 Console.WriteLine("Invalid Guess!");
-                Console.WriteLine("Please type your next guess ({0} letters between {1}-{2}):", m_guessLength, firstArrayChar, lastArrayChar);
+                Console.WriteLine("Please type your next guess <{0}> or '{1}' to quit:", lettersDisplay, k_QuitCommand);
                 guess = Console.ReadLine().ToUpper();
-                valid = guess.Length == 4 && guess.All(c => c >= firstArrayChar && c <= lastArrayChar);
+
+                valid = (guess.Length == m_guessLength && guess.All(c => c >= firstArrayChar && c <= lastArrayChar)) || guess == k_QuitCommand;
             } 
             return guess;
         }
@@ -158,25 +155,26 @@ namespace UeserInterface
                 Console.WriteLine($"|{pinsCell}|{resultCell}|");
                 Console.WriteLine(divider);
             }
+            Console.WriteLine();
         }
 
         private static string buildSpacedCell(string raw, int pegCount, int colWidth)
         {
-            var sb = new StringBuilder();
-            sb.Append(' ');
+            var cell = new StringBuilder();
+            cell.Append(' ');
 
             for (int i = 0; i < pegCount; i++)
             {
-                char ch = (i < raw.Length) ? raw[i] : ' ';
-                sb.Append(ch);
+                char cellChar = (i < raw.Length) ? raw[i] : ' ';
+                cell.Append(cellChar);
 
                 if (i < pegCount - 1)
-                    sb.Append(' ');
+                    cell.Append(' ');
             }
 
-            sb.Append(' '); 
+            cell.Append(' '); 
 
-            return sb.ToString().PadRight(colWidth);
+            return cell.ToString().PadRight(colWidth);
         }
         private void printGameResultScreen()
         {
